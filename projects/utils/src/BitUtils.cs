@@ -247,4 +247,94 @@ unsafe public static class BitUtils
 			src[word] = BinaryPrimitives.ReverseEndianness(src[word]);
 		}
 	}
+
+	/// <summary>
+    /// Reads a 2 byte integer value in little endian format
+    /// </summary>
+    /// <param name="value">
+    /// The value to read
+    /// </param>
+    /// <returns>
+    /// The value read in little endian format
+    /// </returns>
+	[MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+	public static short ReadLe(short value)
+	{
+		return BitConverter.IsLittleEndian ? value : BinaryPrimitives.ReverseEndianness(value);
+	}
+
+	/// <summary>
+    /// Reads a 4 byte integer value in little endian format
+    /// </summary>
+    /// <param name="value">
+    /// The value to read
+    /// </param>
+    /// <returns>
+    /// The value read in little endian format
+    /// </returns>
+	[MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+	public static int ReadLe(int value)
+	{
+		return BitConverter.IsLittleEndian ? value : BinaryPrimitives.ReverseEndianness(value);
+	}
+
+	/// <summary>
+    /// Reads an 8 byte integer value in little endian format
+    /// </summary>
+    /// <param name="value">
+    /// The value to read
+    /// </param>
+    /// <returns>
+    /// The value read in little endian format
+    /// </returns>
+	[MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+	public static long ReadLe(long value)
+	{
+		return BitConverter.IsLittleEndian ? value : BinaryPrimitives.ReverseEndianness(value);
+	}
+
+	/// <summary>
+    /// Reads a 2 byte unsigned integer value in little endian format
+    /// </summary>
+    /// <param name="value">
+    /// The value to read
+    /// </param>
+    /// <returns>
+    /// The value read in little endian format
+    /// </returns>
+	[MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+	public static ushort ReadLe(ushort value)
+	{
+		return BitConverter.IsLittleEndian ? value : BinaryPrimitives.ReverseEndianness(value);
+	}
+
+	/// <summary>
+    /// Reads a 4 byte unsigned integer value in little endian format
+    /// </summary>
+    /// <param name="value">
+    /// The value to read
+    /// </param>
+    /// <returns>
+    /// The value read in little endian format
+    /// </returns>
+	[MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+	public static uint ReadLe(uint value)
+	{
+		return BitConverter.IsLittleEndian ? value : BinaryPrimitives.ReverseEndianness(value);
+	}
+
+	/// <summary>
+    /// Reads an 8 byte unsigned integer value in little endian format
+    /// </summary>
+    /// <param name="value">
+    /// The value to read
+    /// </param>
+    /// <returns>
+    /// The value read in little endian format
+    /// </returns>
+	[MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+	public static ulong ReadLe(ulong value)
+	{
+		return BitConverter.IsLittleEndian ? value : BinaryPrimitives.ReverseEndianness(value);
+	}
 }
