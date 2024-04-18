@@ -6,7 +6,7 @@ namespace CeetemSoft.Utils;
 /// <summary>
 /// Provides a class of utility functions for bit operations
 /// </summary>
-unsafe public static class BitUtils
+unsafe public static class DataUtils
 {
 	/// <summary>
     /// Reverses the endianness of a 2 byte signed integer
