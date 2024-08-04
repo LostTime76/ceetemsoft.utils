@@ -1,0 +1,17 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+	{
+		"name": "Debug Test",
+		"type": "coreclr",
+		"preLaunchTask": "Debug Build",
+		"request": "launch",
+		"cwd": "${workspaceFolder}\\projects\\test\\",
+		"console": "internalConsole",
+		"stopAtEntry": false,
+		"program": "${workspaceFolder}\\artifacts\\bin\\test\\debug\\test.exe",
+		"args": [
+
+		]
+	}]
+}
