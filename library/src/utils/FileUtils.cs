@@ -9,6 +9,34 @@ namespace CeetemSoft.Utils;
 public static class FileUtils
 {
 	/// <summary>
+    /// Gets a value that indicates if a string represents a valid file extension
+    /// </summary>
+    /// <param name="extension">
+    /// The string to check
+    /// </param>
+    /// <returns>
+    /// True if <paramref name="extension"/> represents a valid file extension, false otherwise
+    /// </returns>
+	public static bool IsValidExtension([NotNullWhen(true)] string? extension)
+	{
+		return IsValidExtension(extension.AsSpan());
+	}
+
+	/// <summary>
+    /// Gets a value that indicates if a span of characters represents a valid file extension
+    /// </summary>
+    /// <param name="extension">
+    /// The span of characters to check
+    /// </param>
+    /// <returns>
+    /// True if <paramref name="extension"/> represents a valid file extension, false otherwise
+    /// </returns>
+	public static bool IsValidExtension(ReadOnlySpan<char> extension)
+	{
+		return (extension = extension.Trim()).StartsWith('.') && (extension.Length > 1);
+	}
+
+	/// <summary>
     /// Writes text to a file if it does not exist or its contents differs than the text to write
     /// </summary>
     /// <param name="filepath">

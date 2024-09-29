@@ -12,147 +12,66 @@ public static partial class Sclex
 	private const int MaxStackChars = 2048;
 
 	/// <summary>
-    /// Gets a string that is an escaped version of an input string
+    /// Escapes a string using command line argument escaping rules
     /// </summary>
     /// <param name="input">
-    /// The input string to escape
-    /// </param>
-    /// <param name="options">
-    /// The options for the operation. All options except for <see cref="SclexOptions.Trim"/> are
-    /// ignored.
+    /// The string to escape
     /// </param>
     /// <returns>
-    /// The escaped string
+    /// An escaped string or empty
     /// </returns>
-	public static string Escape(string? input, SclexOptions options = SclexOptions.Default)
+    /// <remarks>
+    /// This function trims the input string by removing whitespace from the beginning and end of
+    /// the string. If the string still contains whitespace after the trim operation, it is enclosed
+    /// within quotes and finally returned.
+    /// </remarks>
+	public static string Escape(string? input)
 	{
-		return Escape(input.AsSpan(), options);
+		return Escape(input.AsSpan());
 	}
 
 	/// <summary>
-    /// Gets a string that is an escaped version of a span of characters
+    /// Escapes a span of characters using command line argument escaping rules
     /// </summary>
     /// <param name="input">
     /// The span of characters to escape
     /// </param>
-    /// <param name="options">
-    /// The options for the operation. All options except for <see cref="SclexOptions.Trim"/> are
-    /// ignored.
-    /// </param>
     /// <returns>
-    /// The escaped string
+    /// An escaped string or empty
     /// </returns>
+    /// <remarks>
+    /// This function trims the input span by removing whitespace from the beginning and end of the
+    /// the span. If the span still contains whitespace after the trim operation, it is enclosed
+    /// within quotes and finally returned.
+    /// </remarks>
 	[SkipLocalsInit]
-	public static string Escape(
-		scoped ReadOnlySpan<char> input,
-		SclexOptions options = SclexOptions.Default)
+	public static string Escape(scoped ReadOnlySpan<char> input)
 	{
 		// Allocate the memory for the escape operation
 		int mlen = GetEscapedMaxLength(input);
 		var dest = mlen > MaxStackChars ? stackalloc char[mlen] : new char[mlen];
 
 		// Escape the input
-		input = EscapeCore(input, dest, options);
+		input = EscapeCore(input, dest);
 
 		// Allocate the string
 		return input.IsEmpty ? string.Empty : input.ToString();
 	}
 
 	/// <summary>
-    /// Joins all of the strings within an array seperated by a space character
-    /// </summary>
-    /// <param name="inputs">
-    /// The array containing the strings to join
-    /// </param>
-    /// <param name="options">
-    /// The options for the operation
-    /// </param>
-    /// <returns>
-    /// The joined string
-    /// </returns>
-    /// <remarks>
-    /// Strings within the array that are null or result in an empty string after trimming are not
-    /// added to the output.
-    /// </remarks>
-	public static string Join(string?[]? inputs, SclexOptions options = SclexOptions.Default)
-	{
-		return Join(inputs.AsSpan(), options);
-	}
-
-	/// <summary>
-    /// Joins all of the strings within an enumerable seperated by a space character
-    /// </summary>
-    /// <param name="inputs">
-    /// The enumerable containing the strings to join
-    /// </param>
-    /// <param name="options">
-    /// The options for the operation
-    /// </param>
-    /// <returns>
-    /// The joined string
-    /// </returns>
-    /// <remarks>
-    /// Strings within the enumerable that are null or result in an empty string after trimming are
-    /// not added to the output.
-    /// </remarks>
-	public static string Join(
-		IEnumerable<string?>? inputs,
-		SclexOptions options = SclexOptions.Default)
-	{
-		if (inputs == null)
-		{
-			return string.Empty;
-		}
-
-		StringBuilder text = new();
-
-		foreach (string? input in inputs)
-		{
-			JoinInput(text, input, options);
-		}
-
-		return text.Length > 0 ? text.ToString() : string.Empty;
-	}
-
-	/// <summary>
-    /// Joins all of the strings within a span seperated by a space character
-    /// </summary>
-    /// <param name="inputs">
-    /// The span containing the strings to join
-    /// </param>
-    /// <param name="options">
-    /// The options for the operation
-    /// </param>
-    /// <returns>
-    /// The joined string
-    /// </returns>
-    /// <remarks>
-    /// Strings within the span that are null or result in an empty string after trimming are not
-    /// added to the output.
-    /// </remarks>
-	public static string Join(
-		ReadOnlySpan<string?> inputs,
-		SclexOptions options = SclexOptions.Default)
-	{
-		StringBuilder text = new();
-
-		for (int idx = 0; idx < inputs.Length; idx++)
-		{
-			JoinInput(text, inputs[idx], options);
-		}
-
-		return text.Length > 0 ? text.ToString() : string.Empty;
-	}
-
-	/// <summary>
-    /// Splits a span of characters into individual strings using command line escape rules.
+    /// Splits an input span of characters into individual strings using command line argument
+    /// splitting rules.
     /// </summary>
     /// <param name="input">
     /// The span of characters to split
     /// </param>
     /// <returns>
-    /// An enumerable of strings split from the input
+    /// An enumerable containing all of the individual strings split from the input
     /// </returns>
+    /// <remarks>
+    /// This function is the inverse of the join operation. Additionally, the function is equivalent
+    /// to converting a command line entered into a shell, for example, into individual arguments.
+    /// </remarks>
 	public static IEnumerable<string> Split(ReadOnlySpan<char> input)
 	{
 		List<string>     outputs = [];
@@ -167,6 +86,138 @@ public static partial class Sclex
 		}
 
 		return outputs;
+	}
+
+	/// <summary>
+    /// Concatenates an array of strings into a single string using command line argument escaping
+    /// rules
+    /// </summary>
+    /// <param name="inputs">
+    /// The array of strings to concatenate into a string
+    /// </param>
+    /// <returns>
+    /// A single string created from all of the input strings
+    /// </returns>
+    /// <remarks>
+    /// See <see cref="Join(ReadOnlySpan{object?})"/> for remarks
+    /// </remarks>
+	public static string Join(params object?[]? inputs)
+	{
+		return Join(inputs.AsSpan());
+	}
+
+	/// <summary>
+    /// Concatenates an span of strings into a single string using command line argument escaping
+    /// rules
+    /// </summary>
+    /// <param name="inputs">
+    /// The span of strings to concatenate into a string
+    /// </param>
+    /// <returns>
+    /// A single string created from all of the input strings
+    /// </returns>
+    /// <remarks>
+    /// This function takes as input an span of objects instead of strings. When an enumerable
+    /// element within the span is encountered, its elements are recurisely concatenated to the
+    /// output string. Otherwise, the element's <see cref="object.ToString"/> function is called to
+    /// get the string representation of the element. The string is escaped using command line
+    /// argument escaping rules and finally appended to the output string. Elements that are null
+    /// or result in an empty string are not concatenated into the output string.
+    /// </remarks>
+	public static string Join(ReadOnlySpan<object?> inputs)
+	{
+		if (inputs.IsEmpty)
+		{
+			return string.Empty;
+		}
+
+		StringBuilder text = new();
+
+		Join(text, inputs);
+
+		return text.Length > 0 ? text.ToString() : string.Empty;
+	}
+
+	/// <summary>
+    /// Concatenates an enumerable of strings into a single string using command line argument
+    /// escaping rules
+    /// </summary>
+    /// <param name="inputs">
+    /// The enumerable of strings to concatenate into a string
+    /// </param>
+    /// <returns>
+    /// A single string created from all of the input strings
+    /// </returns>
+    /// <remarks>
+    /// See <see cref="Join(ReadOnlySpan{object?})"/> for remarks
+    /// </remarks>
+	public static string Join(IEnumerable<object?>? inputs)
+	{
+		if (inputs == null)
+		{
+			return string.Empty;
+		}
+
+		StringBuilder text = new();
+
+		Join(text, inputs);
+
+		return text.Length > 0 ? text.ToString() : string.Empty;
+	}
+
+	private static void Join(StringBuilder text, ReadOnlySpan<object?> inputs)
+	{
+		for (int idx = 0; idx < inputs.Length; idx++)
+		{
+			Join(text, inputs[idx]);
+		}
+	}
+
+	private static void Join(StringBuilder text, IEnumerable<object?> inputs)
+	{
+		foreach (object? input in inputs)
+		{
+			Join(text, input);
+		}
+	}
+
+	private static void Join(StringBuilder text, object? input)
+	{
+		if (input == null)
+		{
+			return;
+		}
+		else if (input is IEnumerable<object?> child)
+		{
+			Join(text, child);
+		}
+		else
+		{
+			Join(text, input.ToString().AsSpan());
+		}
+	}
+
+	[SkipLocalsInit]
+	private static void Join(StringBuilder text, scoped ReadOnlySpan<char> input)
+	{
+		// Allocate the memory for the escape operation
+		int mlen = GetEscapedMaxLength(input);
+		var dest = mlen > MaxStackChars ? stackalloc char[mlen] : new char[mlen];
+
+		// Escape the input
+		if ((input = EscapeCore(input, dest)).IsEmpty)
+		{
+			return;
+		}
+
+		// Add a separator
+		else if (text.Length > 0)
+		{
+			text.Append(' ');
+		}
+
+		// Append the input
+		text.Append(input);
 	}
 
 	private static string? ReadOutput(ref SpanReader<char> reader, StringBuilder text)
@@ -281,50 +332,10 @@ public static partial class Sclex
 		return false;
 	}
 
-	[SkipLocalsInit]
-	private static void JoinInput(
-		StringBuilder text,
-		scoped ReadOnlySpan<char> input,
-		SclexOptions options)
-	{
-		// Escape the input
-		if ((options & SclexOptions.Escape) != 0)
-		{
-			// Allocate the memory for the escape operation
-			int mlen = GetEscapedMaxLength(input);
-			var dest = mlen > MaxStackChars ? stackalloc char[mlen] : new char[mlen];
-
-			// Escape the input
-			input = EscapeCore(input, dest, options);
-		}
-
-		// Check if the input is empty
-		if (input.IsEmpty)
-		{
-			return;
-		}
-
-		// Add a seperator
-		else if (text.Length > 0)
-		{
-			text.Append(' ');
-		}
-
-		// Append the input to the string
-		text.Append(input);
-	}
-
-	private static ReadOnlySpan<char> EscapeCore(
-		ReadOnlySpan<char> input,
-		Span<char> dest,
-		SclexOptions options)
+	private static ReadOnlySpan<char> EscapeCore(ReadOnlySpan<char> input, Span<char> dest)
 	{
 		// Trim whitespace from the input
-		if ((options & SclexOptions.Trim) != 0)
-		{
-			input = input.Trim();
-		}
-		if (input.IsEmpty)
+		if ((input = input.Trim()).IsEmpty)
 		{
 			return default;
 		}

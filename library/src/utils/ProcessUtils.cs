@@ -36,7 +36,7 @@ public static class ProcessUtils
     /// the process as it executes. The function does not return until the process has finished and
     /// exited.
     /// </remarks>
-	public static ExecResult Execute(
+	public static ExecuteResult Execute(
 		string executable,
 		string? arguments = null,
 		string? workingDirectory = null)
@@ -91,22 +91,5 @@ public static class ProcessUtils
 			Output   = string.IsNullOrEmpty(output) ? null : output,
 			Error    = string.IsNullOrEmpty(error) ? null : error
 		};
-	}
-
-	/// <summary>
-    /// Creates a response file
-    /// </summary>
-    /// <param name="filepath">
-    /// The path of the response file to create
-    /// </param>
-    /// <param name="arguments">
-    /// The arguments to write to the response file
-    /// </param>
-	public static void CreateResponseFile(string filepath, string? arguments)
-	{
-		using (StreamWriter writer = new(new FileStream(filepath, FileMode.Create)))
-		{
-			writer.Write(arguments);
-		}
 	}
 }

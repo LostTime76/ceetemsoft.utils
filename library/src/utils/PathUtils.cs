@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+
 namespace CeetemSoft.Utils;
 
 /// <summary>
@@ -6,48 +8,31 @@ namespace CeetemSoft.Utils;
 public static class PathUtils
 {
 	/// <summary>
-    /// Gets the common directory of all the paths within a span
+    /// Gets the path of the current source file which makes the call
     /// </summary>
-    /// <param name="paths">
-    /// The span containing the paths to get the common directory of
+    /// <param name="source">
+    /// This parameter should always be null as it is filled in by the compiler at compile time
     /// </param>
     /// <returns>
-    /// The common directory of all the paths within <paramref name="paths"/> or empty if
-    /// <paramref name="paths"/> is empty
+    /// The path of source file which made the call
     /// </returns>
-	public static string GetCommonDirectory(ReadOnlySpan<string> paths)
+	public static string GetCurrentSourcePath([CallerFilePath] string? source = null)
 	{
-		return Path.GetDirectoryName(StringUtils.GetCommonPrefix(paths)) ?? string.Empty;
+		return source!;
 	}
 
 	/// <summary>
-    /// Gets the common directory of all the paths within an array
+    /// Gets the directory of the current source file which makes the call
     /// </summary>
-    /// <param name="paths">
-    /// The array containing the paths to get the common directory of
+    /// <param name="source">
+    /// This parameter should always be null as it is filled in by the compiler at compile time
     /// </param>
     /// <returns>
-    /// The common directory of all the paths within <paramref name="paths"/> or empty if
-    /// <paramref name="paths"/> is null
+    /// The directory of the source file which made the call
     /// </returns>
-	public static string GetCommonDirectory(params string[]? paths)
+	public static string GetCurrentSourceDirectory([CallerFilePath] string? source = null)
 	{
-		return GetCommonDirectory(paths.AsSpan());
-	}
-
-	/// <summary>
-    /// Gets the common directory of all the paths within an enumerable
-    /// </summary>
-    /// <param name="paths">
-    /// The enumerable containing the paths to get the common directory of
-    /// </param>
-    /// <returns>
-    /// The common directory of all the paths within <paramref name="paths"/> or empty if
-    /// <paramref name="paths"/> is null
-    /// </returns>
-	public static string GetCommonDirectory(IEnumerable<string>? paths)
-	{
-		return Path.GetDirectoryName(StringUtils.GetCommonPrefix(paths)) ?? string.Empty;
+		return GetDirectoryNameOrEmpty(source);
 	}
 
 	/// <summary>
