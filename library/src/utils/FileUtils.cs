@@ -91,7 +91,7 @@ public static class FileUtils
     /// True if the file exists and the timestamp of the file is greater than or equal to
     /// <paramref name="timestamp"/>, otherwise false
     /// </returns>
-	public static bool IsNewer(string? filepath, long timestamp)
+	public static bool IsNewer([NotNullWhen(true)]string? filepath, long timestamp)
 	{
 		long otimestamp;
 
@@ -111,7 +111,7 @@ public static class FileUtils
     /// True if the file does not exist or its timestamp is less than <paramref name="timestamp"/>,
     /// otherwise false
     /// </returns>
-	public static bool IsOlder(string? filepath, long timestamp)
+	public static bool IsOlder([NotNullWhen(false)]string? filepath, long timestamp)
 	{
 		long otimestamp;
 

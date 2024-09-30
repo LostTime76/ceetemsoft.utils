@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace CeetemSoft.Utils;
 
 /// <summary>
@@ -14,7 +16,7 @@ public static class DirectoryUtils
     /// <returns>
     /// True if the directory exists or is created successfully, false otherwise
     /// </returns>
-	public static bool TryCreateDirectory(string? directory)
+	public static bool TryCreateDirectory([NotNullWhen(true)]string? directory)
 	{
 		if (string.IsNullOrEmpty(directory))
 		{

@@ -13,9 +13,11 @@ public static class ConsoleUtils
     /// </param>
 	public static void WriteLineIfNotEmpty(string? text)
 	{
-		if (!string.IsNullOrEmpty(text))
+		if (string.IsNullOrEmpty(text))
 		{
-			Console.WriteLine(text);
+			return;
 		}
+
+		Console.WriteLine(text);
 	}
 }

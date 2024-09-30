@@ -1,5 +1,3 @@
-using CeetemSoft.UcBuild;
-
 namespace Test;
 
 /// <summary>
@@ -7,7 +5,7 @@ namespace Test;
 /// </summary>
 public static class BuildRules
 {
-	private static readonly RuleBuilder _ccRuleBuilder = new RuleBuilder()
+	/*private static readonly RuleBuilder _ccRuleBuilder = new RuleBuilder()
 		.WithExecutable("clang")
 		.WithResponse()
 		.AddArguments("-c")
@@ -33,5 +31,5 @@ public static class BuildRules
 	/// <summary>
     /// Gets the link rule for the project
     /// </summary>
-	public static readonly BuildRule LinkRule = _ldRuleBuilder.CreateRule();
+	public static readonly BuildRule LinkRule = _ldRuleBuilder.CreateRule(); */
 }

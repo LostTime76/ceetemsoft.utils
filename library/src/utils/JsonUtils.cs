@@ -29,16 +29,10 @@ public static class JsonUtils
     /// deserialization failed, or if the result value of the deserialization is null
     /// </returns>
 	public static bool TryDeserialize<T>(
-		string filepath,
+		[NotNullWhen(true)]string filepath,
 		JsonTypeInfo<T> type,
 		[NotNullWhen(true)]out T? value)
 	{
-		if (!File.Exists(filepath))
-		{
-			value = default;
-			return false;
-		}
-
 		try
 		{
 			value = JsonSerializer.Deserialize(File.ReadAllText(filepath), type);

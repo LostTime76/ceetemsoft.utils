@@ -1,6 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices;
-
 namespace CeetemSoft.Utils;
 
 /// <summary>
@@ -8,36 +5,6 @@ namespace CeetemSoft.Utils;
 /// </summary>
 public static class StringUtils
 {
-	/// <summary>
-    /// Gets a value that indicates if a string empty
-    /// </summary>
-    /// <param name="input">
-    /// The string to check
-    /// </param>
-    /// <returns>
-    /// True if <paramref name="input"/> is empty, false otherwise
-    /// </returns>
-	[MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-	public static bool IsEmpty([NotNullWhen(true)]string? input)
-	{
-		return IsEmpty(input.AsSpan());
-	}
-
-	/// <summary>
-    /// Gets a value that indicates if a span of characters is empty
-    /// </summary>
-    /// <param name="input">
-    /// The span of characters to check
-    /// </param>
-    /// <returns>
-    /// True if <paramref name="input"/> is empty, false otherwise
-    /// </returns>
-	[MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-	public static bool IsEmpty(ReadOnlySpan<char> input)
-	{
-		return input.Trim().IsEmpty;
-	}
-
 	/// <summary>
     /// Gets the common prefix of all the strings within a span
     /// </summary>
