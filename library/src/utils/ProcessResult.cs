@@ -1,9 +1,9 @@
 namespace CeetemSoft.Utils;
 
 /// <summary>
-/// Provides a structure to obtain the result of executing a process
+/// Provides a structure to obtain the result of invoking a process
 /// </summary>
-public readonly struct ExecuteResult
+public readonly struct ProcessResult
 {
 	/// <summary>
     /// Gets or initializes the exit code of the process

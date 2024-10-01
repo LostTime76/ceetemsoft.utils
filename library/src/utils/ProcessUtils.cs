@@ -36,7 +36,7 @@ public static class ProcessUtils
     /// the process as it executes. The function does not return until the process has finished and
     /// exited.
     /// </remarks>
-	public static ExecuteResult Execute(
+	public static ProcessResult Execute(
 		string executable,
 		string? arguments = null,
 		string? workingDirectory = null)

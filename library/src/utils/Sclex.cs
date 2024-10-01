@@ -98,10 +98,7 @@ public static partial class Sclex
     /// <returns>
     /// A single string created from all of the input strings
     /// </returns>
-    /// <remarks>
-    /// See <see cref="Join(ReadOnlySpan{object?})"/> for remarks
-    /// </remarks>
-	public static string Join(params object?[]? inputs)
+	public static string Join(params string?[]? inputs)
 	{
 		return Join(inputs.AsSpan());
 	}
@@ -116,15 +113,7 @@ public static partial class Sclex
     /// <returns>
     /// A single string created from all of the input strings
     /// </returns>
-    /// <remarks>
-    /// This function takes as input an span of objects instead of strings. When an enumerable
-    /// element within the span is encountered, its elements are recurisely concatenated to the
-    /// output string. Otherwise, the element's <see cref="object.ToString"/> function is called to
-    /// get the string representation of the element. The string is escaped using command line
-    /// argument escaping rules and finally appended to the output string. Elements that are null
-    /// or result in an empty string are not concatenated into the output string.
-    /// </remarks>
-	public static string Join(ReadOnlySpan<object?> inputs)
+	public static string Join(ReadOnlySpan<string?> inputs)
 	{
 		if (inputs.IsEmpty)
 		{
@@ -133,7 +122,10 @@ public static partial class Sclex
 
 		StringBuilder text = new();
 
-		Join(text, inputs);
+		for (int idx = 0; idx < inputs.Length; idx++)
+		{
+			Join(text, inputs[idx]);
+		}
 
 		return text.Length > 0 ? text.ToString() : string.Empty;
 	}
@@ -148,10 +140,7 @@ public static partial class Sclex
     /// <returns>
     /// A single string created from all of the input strings
     /// </returns>
-    /// <remarks>
-    /// See <see cref="Join(ReadOnlySpan{object?})"/> for remarks
-    /// </remarks>
-	public static string Join(IEnumerable<object?>? inputs)
+	public static string Join(IEnumerable<string?>? inputs)
 	{
 		if (inputs == null)
 		{
@@ -160,41 +149,12 @@ public static partial class Sclex
 
 		StringBuilder text = new();
 
-		Join(text, inputs);
-
-		return text.Length > 0 ? text.ToString() : string.Empty;
-	}
-
-	private static void Join(StringBuilder text, ReadOnlySpan<object?> inputs)
-	{
-		for (int idx = 0; idx < inputs.Length; idx++)
-		{
-			Join(text, inputs[idx]);
-		}
-	}
-
-	private static void Join(StringBuilder text, IEnumerable<object?> inputs)
-	{
-		foreach (object? input in inputs)
+		foreach(string? input in inputs)
 		{
 			Join(text, input);
 		}
-	}
 
-	private static void Join(StringBuilder text, object? input)
-	{
-		if (input == null)
-		{
-			return;
-		}
-		else if (input is IEnumerable<object?> child)
-		{
-			Join(text, child);
-		}
-		else
-		{
-			Join(text, input.ToString().AsSpan());
-		}
+		return text.Length > 0 ? text.ToString() : string.Empty;
 	}
 
 	[SkipLocalsInit]
