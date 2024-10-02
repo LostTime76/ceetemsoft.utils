@@ -2,6 +2,19 @@
 	"version": "0.2.0",
 	"configurations": [
 	{
+		"name": "Debug UcBuild",
+		"type": "coreclr",
+		"preLaunchTask": "Debug Build",
+		"request": "launch",
+		"cwd": "${workspaceFolder}\\tests\\ucbuild",
+		"console": "internalConsole",
+		"stopAtEntry": false,
+		"program": "${workspaceFolder}\\artifacts\\bin\\ucbuild\\debug\\ucbuild.exe",
+		"args": [
+
+		]
+	},
+	{
 		"name": "Debug Scratch",
 		"type": "coreclr",
 		"preLaunchTask": "Debug Build",
