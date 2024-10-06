@@ -59,6 +59,47 @@ public static partial class Sclex
 	}
 
 	/// <summary>
+    /// Splits an input span of characters into an executable and arguments using command line
+    /// argument splitting rules
+    /// </summary>
+    /// <param name="input">
+    /// The span of characters to split
+    /// </param>
+    /// <returns>
+    /// A tuple whose first element is the executable and second element is the string of arguments
+    /// following the executable. The elements will always at least contain empty strings.
+    /// </returns>
+	public static (string, string) SplitCommand(ReadOnlySpan<char> input)
+	{
+		if ((input = input.Trim()).IsEmpty)
+		{
+			return (string.Empty, string.Empty);
+		}
+
+		string?          executable;
+		StringBuilder    text   = new();
+		SpanReader<char> reader = new(input);
+
+		// Read the executable
+		if ((executable = ReadOutput(ref reader, text)) == null)
+		{
+			return (string.Empty, string.Empty);
+		}
+
+		// Trim the executable
+		executable = executable.Trim();
+
+		// Advance to the argument list
+		if (!SkipWhitespace(ref reader))
+		{
+			return (executable, string.Empty);
+		}
+
+		// Construct the argument string
+		return (executable, input[(reader.Index - 1)..].ToString().Trim());
+	}
+
+	/// <summary>
     /// Splits an input span of characters into individual strings using command line argument
     /// splitting rules.
     /// </summary>
@@ -66,14 +107,19 @@ public static partial class Sclex
     /// The span of characters to split
     /// </param>
     /// <returns>
-    /// An enumerable containing all of the individual strings split from the input
+    /// A list containing all of the individual strings split from the input
     /// </returns>
     /// <remarks>
     /// This function is the inverse of the join operation. Additionally, the function is equivalent
     /// to converting a command line entered into a shell, for example, into individual arguments.
     /// </remarks>
-	public static IEnumerable<string> Split(ReadOnlySpan<char> input)
+	public static List<string> Split(ReadOnlySpan<char> input)
 	{
+		if ((input = input.Trim()).IsEmpty)
+		{
+			return [];
+		}
+
 		List<string>     outputs = [];
 		StringBuilder    text    = new();
 		SpanReader<char> reader  = new(input);

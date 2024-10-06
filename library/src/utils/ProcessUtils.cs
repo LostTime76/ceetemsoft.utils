@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 namespace CeetemSoft.Utils;
 
@@ -15,11 +16,10 @@ public static class ProcessUtils
 	/// <summary>
     /// Provides a simple means to execute a command line process and retrieve its results
     /// </summary>
-    /// <param name="executable">
-    /// The path to the process executable
-    /// </param>
-    /// <param name="arguments">
-    /// The command line arguments to pass to the process
+    /// <param name="command">
+    /// The command line to execute. The first element of the command line is interpreted as the
+    /// executable and the following elements are interpreted as the arguments to pass to the
+    /// executable.
     /// </param>
     /// <param name="workingDirectory">
     /// The working directory for the process. If the value is null or empty, the current working
@@ -29,20 +29,20 @@ public static class ProcessUtils
     /// The result of the process execution
     /// </returns>
     /// <exception cref="ArgumentException">
-    /// Thrown if <paramref name="executable"/> is null or empty
+    /// Thrown if <paramref name="command"/> is null or empty
     /// </exception>
     /// <remarks>
     /// This function creates two threads to read both the standard output and error streams from
     /// the process as it executes. The function does not return until the process has finished and
     /// exited.
     /// </remarks>
-	public static ProcessResult Execute(
-		string executable,
-		string? arguments = null,
-		string? workingDirectory = null)
+	public static ProcessResult Execute(string command, string? workingDirectory = null)
 	{
-		// Make sure the executable is somewhat valid...
-		ArgumentException.ThrowIfNullOrEmpty(executable);
+		// Split the command
+		(string executable, string arguments) = Sclex.SplitCommand(command);
+
+		// Ensure at least we found an executable
+		ArgumentException.ThrowIfNullOrEmpty(executable, nameof(command));
 
 		// Use the current directory if the working directory is not specified
 		workingDirectory = string.IsNullOrEmpty(workingDirectory) ?
@@ -53,7 +53,7 @@ public static class ProcessUtils
 		{
 			FileName               = executable,
 			WorkingDirectory       = workingDirectory,
-			Arguments              = arguments ?? string.Empty,
+			Arguments              = arguments,
 			RedirectStandardOutput = true,
 			RedirectStandardError  = true
 		}};

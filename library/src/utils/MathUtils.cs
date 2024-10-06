@@ -8,19 +8,20 @@ namespace CeetemSoft.Utils;
 public static class MathUtils
 {
 	/// <summary>
-    /// Ensures that a given integer value is greater than or equal to a minimum value
+    /// Ensures that a given integer value is greater than or equal to another integer value
     /// </summary>
     /// <param name="value">
-    /// The value
+    /// The integer value to bound
     /// </param>
     /// <param name="minimum">
-    /// The minimum allowable value
+    /// The integer value to bound to
     /// </param>
     /// <returns>
-    /// A value that is always greater than or equal to <paramref name="minimum"/>.
+    /// If <paramref name="value"/> is greater than or equal to <paramref name="minimum"/>,
+    /// <paramref name="value"/> is returned, otherwise <paramref name="minimum"/> is returned.
     /// </returns>
 	[MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-	public static int AtLeast(int value, int minimum)
+	public static int EnsureGte(int value, int minimum)
 	{
 		return value >= minimum ? value : minimum;
 	}
