@@ -31,7 +31,7 @@ public static class ArrayExtensions
     /// </exception>
 	public static T[] InsertRange<T>(this T[] array, int index, ReadOnlySpan<T> items)
 	{
-		return items.IsEmpty ? array.ToArray() : InsertRange(array, index, items, null);
+		return items.IsEmpty ? [.. array] : InsertRange(array, index, items, null);
 	}
 
 	/// <summary>
@@ -60,7 +60,7 @@ public static class ArrayExtensions
     /// </exception>
 	public static T[] InsertRange<T>(this T[] array, int index, IEnumerable<T>? items)
 	{
-		return items != null ? InsertRange(array, index, default, items) : array.ToArray();
+		return items != null ? InsertRange(array, index, default, items) : [.. array];
 	}
 
 	private static T[] InsertRange<T>(

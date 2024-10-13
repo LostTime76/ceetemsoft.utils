@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Runtime.InteropServices;
 
 namespace CeetemSoft.Utils;
 
@@ -9,9 +8,9 @@ namespace CeetemSoft.Utils;
 public static class ProcessUtils
 {
 	/// <summary>
-    /// The maximum length in characters of command line arguments passed to a process
+    /// The maximum length in characters of a command line command
     /// </summary>
-	public const int MaxArgumentsLength = 32000;
+	public const int MaxCommandLength = 32000;
 
 	/// <summary>
     /// Provides a simple means to execute a command line process and retrieve its results

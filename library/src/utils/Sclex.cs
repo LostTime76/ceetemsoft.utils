@@ -9,6 +9,11 @@ namespace CeetemSoft.Utils;
 /// </summary>
 public static partial class Sclex
 {
+	/// <summary>
+    /// Gets the default seperator used for join operations
+    /// </summary>
+	public const string DefaultSeparator = " ";
+
 	private const int MaxStackChars = 2048;
 
 	/// <summary>
@@ -156,21 +161,29 @@ public static partial class Sclex
     /// <param name="inputs">
     /// The span of strings to concatenate into a string
     /// </param>
+    /// <param name="separator">
+    /// The separator to add between arguments. If null is specified <see cref="DefaultSeparator"/>
+    /// is used.
+    /// </param>
     /// <returns>
     /// A single string created from all of the input strings
     /// </returns>
-	public static string Join(ReadOnlySpan<string?> inputs)
+	public static string Join(ReadOnlySpan<string?> inputs, string? separator = DefaultSeparator)
 	{
 		if (inputs.IsEmpty)
 		{
 			return string.Empty;
 		}
 
+		// Ensure we have a valid separator
+		separator ??= DefaultSeparator;
+
+		// Create a new string builder
 		StringBuilder text = new();
 
 		for (int idx = 0; idx < inputs.Length; idx++)
 		{
-			Join(text, inputs[idx]);
+			Join(text, inputs[idx], separator);
 		}
 
 		return text.Length > 0 ? text.ToString() : string.Empty;
@@ -183,28 +196,36 @@ public static partial class Sclex
     /// <param name="inputs">
     /// The enumerable of strings to concatenate into a string
     /// </param>
+	/// <param name="separator">
+    /// The separator to add between arguments. If null is specified <see cref="DefaultSeparator"/>
+    /// is used.
+    /// </param>
     /// <returns>
     /// A single string created from all of the input strings
     /// </returns>
-	public static string Join(IEnumerable<string?>? inputs)
+	public static string Join(IEnumerable<string?>? inputs, string? separator = DefaultSeparator)
 	{
 		if (inputs == null)
 		{
 			return string.Empty;
 		}
 
+		// Ensure we have a valid separator
+		separator ??= DefaultSeparator;
+
+		// Create a new string builder
 		StringBuilder text = new();
 
 		foreach(string? input in inputs)
 		{
-			Join(text, input);
+			Join(text, input, separator);
 		}
 
 		return text.Length > 0 ? text.ToString() : string.Empty;
 	}
 
 	[SkipLocalsInit]
-	private static void Join(StringBuilder text, scoped ReadOnlySpan<char> input)
+	private static void Join(StringBuilder text, scoped ReadOnlySpan<char> input, string separator)
 	{
 		// Allocate the memory for the escape operation
 		int mlen = GetEscapedMaxLength(input);
@@ -219,7 +240,7 @@ public static partial class Sclex
 		// Add a separator
 		else if (text.Length > 0)
 		{
-			text.Append(' ');
+			text.Append(separator);
 		}
 
 		// Append the input
