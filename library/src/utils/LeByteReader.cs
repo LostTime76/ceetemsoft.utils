@@ -17,9 +17,13 @@ public ref struct LeByteReader
     /// <param name="data">
     /// The span to read from
     /// </param>
-	public LeByteReader(ReadOnlySpan<byte> data)
+    /// <param name="index">
+    /// The initial reader position
+    /// </param>
+	public LeByteReader(ReadOnlySpan<byte> data, int index = 0)
 	{
-		Data = data;
+		Data  = data;
+		Index = index;
 	}
 
 	/// <summary>

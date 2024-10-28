@@ -17,9 +17,13 @@ public ref struct LeByteWriter
     /// <param name="data">
     /// The span to write to
     /// </param>
-	public LeByteWriter(Span<byte> data)
+    /// <param name="index">
+    /// The initial writer position
+    /// </param>
+	public LeByteWriter(Span<byte> data, int index = 0)
 	{
-		Data = data;
+		Data  = data;
+		Index = index;
 	}
 
 	/// <summary>
