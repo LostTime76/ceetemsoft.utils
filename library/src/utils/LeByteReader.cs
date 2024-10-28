@@ -209,7 +209,7 @@ public ref struct LeByteReader
 	{
 		return BinaryPrimitives.ReadInt16LittleEndian(Data.Slice(index, sizeof(short)));
 	}
-	
+
 	/// <summary>
     /// Reads a 4 byte integer value from the span at a specified position
     /// </summary>
@@ -286,7 +286,7 @@ public ref struct LeByteReader
 	{
 		return BinaryPrimitives.ReadUInt16LittleEndian(Data.Slice(index, sizeof(short)));
 	}
-	
+
 	/// <summary>
     /// Reads a 4 byte unsigned integer value from the span at a specified position
     /// </summary>
@@ -342,9 +342,9 @@ public ref struct LeByteReader
 	public int Left => Data.Length - Index;
 
 	/// <summary>
-	/// Gets the current reader position
+	/// Gets or sets current reader position
 	/// </summary>
-	public int Index { get; private set; }
+	public int Index { get; set; }
 
 	/// <summary>
 	/// Gets the span that is being read from

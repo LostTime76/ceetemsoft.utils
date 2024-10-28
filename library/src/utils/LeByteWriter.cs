@@ -306,9 +306,9 @@ public ref struct LeByteWriter
 	public int Left => Data.Length - Index;
 
 	/// <summary>
-    /// Gets the current writer index
+    /// Gets or sets current writer index
     /// </summary>
-	public int Index { get; private set; }
+	public int Index { get; set; }
 
 	/// <summary>
     /// Gets the span that is being written to
