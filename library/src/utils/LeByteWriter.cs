@@ -27,6 +27,19 @@ public ref struct LeByteWriter
 	}
 
 	/// <summary>
+    /// Writes data to the span at the current writer position and increments the position by the
+    /// number of bytes written
+    /// </summary>
+    /// <param name="data">
+    /// The span containing the data to write
+    /// </param>
+	public void Write(ReadOnlySpan<byte> data)
+	{
+		Write(Index, data);
+		Index += data.Length;
+	}
+
+	/// <summary>
     /// Writes a 1 byte integer value to the span at the current writer position and increments the
     /// position by 1 byte
     /// </summary>
@@ -152,6 +165,20 @@ public ref struct LeByteWriter
 	{
 		WriteUInt64(Index, value);
 		Index += sizeof(ulong);
+	}
+
+	/// <summary>
+    /// Writes data to the span at a specified position
+    /// </summary>
+    /// <param name="index">
+    /// The index within the span to write the data to
+    /// </param>
+    /// <param name="data">
+    /// The span containing the data to write
+    /// </param>
+	public void Write(int index, ReadOnlySpan<byte> data)
+	{
+		data.CopyTo(Data.Slice(index, data.Length));
 	}
 
 	/// <summary>
