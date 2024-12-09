@@ -1,1 +1,3 @@
 artifacts
+tests/ucbuild/cproj/src/lots/*[ch]
+tests/ucbuild/cproj/src/version.c

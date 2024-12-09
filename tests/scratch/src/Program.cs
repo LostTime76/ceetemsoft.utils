@@ -1,6 +1,4 @@
-﻿using CeetemSoft.Utils;
-
-namespace Test;
+﻿namespace Test;
 
 unsafe public static class Program
 {

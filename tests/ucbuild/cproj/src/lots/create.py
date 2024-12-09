@@ -16,7 +16,7 @@ for idx in range(src_cnt):
 	
 	# Add includes
 	for hidx in range(hdr_cnt):
-		file.write(f'#include "generated_header_{hidx}"\n')
+		file.write(f'#include "generated_header_{hidx}.h"\n')
 	
 	# Write the file
 	file.close()

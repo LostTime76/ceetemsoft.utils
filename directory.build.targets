@@ -6,7 +6,7 @@
 		</PropertyGroup>
 		
 		<!-- Push the package to the local nuget repository -->
-		<Exec Command="dotnet nuget push $(PackagePath) --source $(LocalNugetSource)"/>
+		<Exec Command="dotnet nuget push &quot;$(PackagePath)&quot; --source &quot;$(LocalNugetSource)&quot;"/>
 		
 		<!-- Delete any locally installed package -->
 		<RemoveDir Directories="$(PackageInstallPath)" Condition="Exists($(PackageInstallPath))"/>
