@@ -117,7 +117,7 @@ unsafe public static class Utf8Native
 
 	/// <summary>
 	/// Allocates a native array of pointers to null terminated utf8 strings encoded from the
-	/// strings within a managed array
+	/// strings within a managed array. The last element within the array is a NULL pointer.
 	/// </summary>
 	/// <param name="strings">
 	/// The managed array containing the strings to encode
@@ -136,7 +136,7 @@ unsafe public static class Utf8Native
 
 	/// <summary>
 	/// Allocates a native array of pointers to null terminated utf8 strings encoded from the
-	/// strings within a span of strings
+	/// strings within a span of strings. The last element within the array is a NULL pointer.
 	/// </summary>
 	/// <param name="strings">
 	/// The span of strings containing the strings to encode
@@ -150,7 +150,7 @@ unsafe public static class Utf8Native
 	{
 		int bytes    = 0;
 		int items    = strings.Length;
-		int arrBytes = sizeof(byte*) * items;
+		int arrBytes = sizeof(byte*) * (items + 1);
 
 		// Count the number of bytes required for all the strings
 		for (int idx = 0; idx < items; idx++)
@@ -174,6 +174,9 @@ unsafe public static class Utf8Native
 			// Set the string pointer
 			array[idx] = dst.AsPointer();
 		}
+
+		// Set the last pointer to NULL
+		array[items] = null;
 
 		// Return the array
 		return array;
@@ -425,6 +428,78 @@ unsafe public static class Utf8Native
 	public static string? GetString(byte* str, int bytes)
 	{
 		return (str != null) && (bytes >= 0) ? Encoding.GetString(str, bytes) : null;
+	}
+
+	/// <summary>
+    /// Gets the number of elements within a null terminated, native string array
+    /// </summary>
+    /// <param name="array">
+    /// The array containing the native strings to count
+    /// </param>
+    /// <returns>
+    /// The number of elements contained within the array if <paramref name="array"/> is not null,
+    /// otherwise -1
+    /// </returns>
+	public static int GetArrayCount(byte** array)
+	{
+		int length = 0;
+
+		if (array == null)
+		{
+			return -1;
+		}
+
+		for (; array[length] != null; length++);
+
+		return length;
+	}
+
+	/// <summary>
+    /// Decodes all of the null terminated utf8 strings within a null terminated, native string
+    /// array into a managed string array
+    /// </summary>
+    /// <param name="array">
+	/// The native string array containing the strings to decode
+	/// </param>
+    /// <returns>
+    /// If <paramref name="array"/> is not null a managed string array containing the decoded
+    /// native strings is returned, otherwise null is returned.
+    /// </returns>
+	[MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+	public static string[]? GetArray(byte** array)
+	{
+		return GetArray(array, GetArrayCount(array));
+	}
+
+	/// <summary>
+    /// Decodes a number of null terminated utf8 strings within a native string array into a
+    /// managed string array
+    /// </summary>
+    /// <param name="array">
+	/// The native string array containing the strings to decode
+	/// </param>
+    /// <param name="length">
+    /// The number of strings within the array to decode
+    /// </param>
+    /// <returns>
+    /// If <paramref name="array"/> is not null and <paramref name="length"/> is >= 0, a managed
+    /// string array containing the decoded native strings is returned, otherwise null is returned.
+    /// </returns>
+	public static string[]? GetArray(byte** array, int length)
+	{
+		if ((array == null) || (length < 0))
+		{
+			return null;
+		}
+
+		string[] decoded = new string[length];
+
+		for (int idx = 0; idx < length; idx++)
+		{
+			decoded[idx] = GetString(array[idx])!;
+		}
+
+		return decoded;
 	}
 
 	/// <summary>
