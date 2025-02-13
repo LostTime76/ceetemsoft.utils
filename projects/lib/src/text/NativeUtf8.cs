@@ -1,3 +1,4 @@
+using CeetemSoft.Collections;
 using CeetemSoft.Runtime;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
@@ -9,7 +10,7 @@ namespace CeetemSoft.Text;
 /// <summary>
 /// Provides a set of native utf8 utility members
 /// </summary>
-unsafe public static class Utf8Native
+unsafe public static class NativeUtf8
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 	internal static readonly Encoding Encoding = new UTF8Encoding(false, false);
@@ -117,66 +118,71 @@ unsafe public static class Utf8Native
 
 	/// <summary>
 	/// Allocates a native array of pointers to null terminated utf8 strings encoded from the
-	/// strings within a managed array. The last element within the array is a NULL pointer.
+	/// strings within a span of strings. The last element within the array is a NULL pointer.
 	/// </summary>
-	/// <param name="strings">
-	/// The managed array containing the strings to encode
+	/// <param name="span">
+	/// The span containing the strings to encode
 	/// </param>
 	/// <returns>
-	/// A pointer to the array of pointers to null terminated utf8 strings The memory must be
+	/// A pointer to the array of pointers to null terminated utf8 strings. The memory must be
     /// freed using the <see cref="NativeMemory.Free(void*)"/> function.
 	/// </returns>
-	/// <exception cref="ArgumentOutOfRangeException"/>
-	/// <exception cref="OutOfMemoryException"/>
-	[MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-	public static byte** Alloc(string[]? strings)
+	public static byte** Alloc(ReadOnlySpan<string> span)
 	{
-		return Alloc(new ReadOnlySpan<string>(strings));
+		byte* first;
+
+		return Alloc(span, &first);
 	}
 
 	/// <summary>
 	/// Allocates a native array of pointers to null terminated utf8 strings encoded from the
 	/// strings within a span of strings. The last element within the array is a NULL pointer.
 	/// </summary>
-	/// <param name="strings">
-	/// The span of strings containing the strings to encode
+	/// <param name="span">
+	/// The span containing the strings to encode
 	/// </param>
+    /// <param name="first">
+    /// A pointer to a variable to store the first item within the native array. If the array is
+    /// empty, the value is set to null.
+    /// </param>
 	/// <returns>
 	/// A pointer to the array of pointers to null terminated utf8 strings. The memory must be
     /// freed using the <see cref="NativeMemory.Free(void*)"/> function.
 	/// </returns>
-	/// <exception cref="OutOfMemoryException"/>
-	public static byte** Alloc(ReadOnlySpan<string> strings)
+	public static byte** Alloc(ReadOnlySpan<string> span, byte** first)
 	{
-		int bytes    = 0;
-		int items    = strings.Length;
-		int arrBytes = sizeof(byte*) * (items + 1);
+		int dbytes = 0;
+		int length = span.Length;
+		int pbytes = sizeof(byte*) * (length + 1);
 
 		// Count the number of bytes required for all the strings
-		for (int idx = 0; idx < items; idx++)
+		for (int idx = 0; idx < length; idx++)
 		{
-			bytes += GetRequiredBytes(strings[idx]);
+			dbytes += GetRequiredBytes(span[idx]);
 		}
 
 		// Allocate the memory for the array
-		byte** array   = (byte**)NativeMemory.Alloc((nuint)(arrBytes + bytes));
-		byte*  strBuff = (byte*)((long)array + arrBytes);
+		byte** array  = (byte**)NativeMemory.Alloc((nuint)(pbytes + dbytes));
+		byte*  buffer = (byte*)((long)array + pbytes);
 
 		// Iterate through all the strings to encode
-		for (int idx = 0, enc = 0; idx < items; idx++)
+		for (int idx = 0, enc = 0; idx < length; idx++)
 		{
 			// Create the destination buffer
-			Span<byte> dst = new(strBuff + enc, bytes - enc);
+			Span<byte> dst = new(buffer + enc, dbytes - enc);
 
 			// Encode the string
-			enc += Encode(strings[idx], dst);
+			enc += Encode(span[idx], dst);
 
 			// Set the string pointer
 			array[idx] = dst.AsPointer();
 		}
 
+		// Set the pointer to the first string within the array
+		*first = length > 0 ? buffer : null;
+
 		// Set the last pointer to NULL
-		array[items] = null;
+		array[length] = null;
 
 		// Return the array
 		return array;
@@ -349,7 +355,9 @@ unsafe public static class Utf8Native
 		{
 			return -1;
 		}
+
 		for (length = 0; str[length] != 0; length++);
+
 		return length;
 	}
 
@@ -375,7 +383,9 @@ unsafe public static class Utf8Native
 		{
 			return -1;
 		}
+
 		for (length = 0; (length < maxBytes) && (str[length] != 0); length++);
+
 		return length;
 	}
 
@@ -431,30 +441,6 @@ unsafe public static class Utf8Native
 	}
 
 	/// <summary>
-    /// Gets the number of elements within a null terminated, native string array
-    /// </summary>
-    /// <param name="array">
-    /// The array containing the native strings to count
-    /// </param>
-    /// <returns>
-    /// The number of elements contained within the array if <paramref name="array"/> is not null,
-    /// otherwise -1
-    /// </returns>
-	public static int GetArrayCount(byte** array)
-	{
-		int length = 0;
-
-		if (array == null)
-		{
-			return -1;
-		}
-
-		for (; array[length] != null; length++);
-
-		return length;
-	}
-
-	/// <summary>
     /// Decodes all of the null terminated utf8 strings within a null terminated, native string
     /// array into a managed string array
     /// </summary>
@@ -468,7 +454,7 @@ unsafe public static class Utf8Native
 	[MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
 	public static string[]? GetArray(byte** array)
 	{
-		return GetArray(array, GetArrayCount(array));
+		return GetArray(array, NativeArray.GetLength(array));
 	}
 
 	/// <summary>
