@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace CeetemSoft.Text;
+namespace CeetemSoft.Native;
 
 /// <summary>
 /// Provides a set of native utf8 utility members
@@ -117,15 +117,16 @@ unsafe public static class NativeUtf8
 	}
 
 	/// <summary>
-	/// Allocates a native array of pointers to null terminated utf8 strings encoded from the
-	/// strings within a span of strings. The last element within the array is a NULL pointer.
+	/// Allocates a native array of pointers to null terminated utf8 strings. The utf8 strings are
+    /// encoded from the managed strings within a span. The array is null terminated with the last
+    /// element set to null.
 	/// </summary>
 	/// <param name="span">
 	/// The span containing the strings to encode
 	/// </param>
 	/// <returns>
-	/// A pointer to the array of pointers to null terminated utf8 strings. The memory must be
-    /// freed using the <see cref="NativeMemory.Free(void*)"/> function.
+	/// A pointer the allocated native array. The memory must be freed using the
+    /// <see cref="NativeMemory.Free(void*)"/> function.
 	/// </returns>
 	public static byte** Alloc(ReadOnlySpan<string> span)
 	{
@@ -135,8 +136,9 @@ unsafe public static class NativeUtf8
 	}
 
 	/// <summary>
-	/// Allocates a native array of pointers to null terminated utf8 strings encoded from the
-	/// strings within a span of strings. The last element within the array is a NULL pointer.
+	/// Allocates a native array of pointers to null terminated utf8 strings. The utf8 strings are
+    /// encoded from the managed strings within a span. The array is null terminated with the last
+    /// element set to null.
 	/// </summary>
 	/// <param name="span">
 	/// The span containing the strings to encode
@@ -146,8 +148,8 @@ unsafe public static class NativeUtf8
     /// empty, the value is set to null.
     /// </param>
 	/// <returns>
-	/// A pointer to the array of pointers to null terminated utf8 strings. The memory must be
-    /// freed using the <see cref="NativeMemory.Free(void*)"/> function.
+	/// A pointer the allocated native array. The memory must be freed using the
+    /// <see cref="NativeMemory.Free(void*)"/> function.
 	/// </returns>
 	public static byte** Alloc(ReadOnlySpan<string> span, byte** first)
 	{
