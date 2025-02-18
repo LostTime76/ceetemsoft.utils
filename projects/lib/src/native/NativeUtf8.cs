@@ -118,44 +118,26 @@ unsafe public static class NativeUtf8
 
 	/// <summary>
 	/// Allocates a native array of pointers to null terminated utf8 strings. The utf8 strings are
-    /// encoded from the managed strings within a span. The array is null terminated with the last
-    /// element set to null.
+    /// encoded from the managed strings within a span.
 	/// </summary>
 	/// <param name="span">
 	/// The span containing the strings to encode
 	/// </param>
 	/// <returns>
 	/// A pointer the allocated native array. The memory must be freed using the
-    /// <see cref="NativeMemory.Free(void*)"/> function.
+    /// <see cref="NativeMemory.Free(void*)"/> function. If <paramref name="span"/> is empty, no
+    /// array is allocated and null is returned.
 	/// </returns>
-	public static byte** Alloc(ReadOnlySpan<string> span)
+	public static byte** Alloc(ReadOnlySpan<string?> span)
 	{
-		byte* first;
+		if (span.IsEmpty)
+		{
+			return null;
+		}
 
-		return Alloc(span, &first);
-	}
-
-	/// <summary>
-	/// Allocates a native array of pointers to null terminated utf8 strings. The utf8 strings are
-    /// encoded from the managed strings within a span. The array is null terminated with the last
-    /// element set to null.
-	/// </summary>
-	/// <param name="span">
-	/// The span containing the strings to encode
-	/// </param>
-    /// <param name="first">
-    /// A pointer to a variable to store the first item within the native array. If the array is
-    /// empty, the value is set to null.
-    /// </param>
-	/// <returns>
-	/// A pointer the allocated native array. The memory must be freed using the
-    /// <see cref="NativeMemory.Free(void*)"/> function.
-	/// </returns>
-	public static byte** Alloc(ReadOnlySpan<string> span, byte** first)
-	{
 		int dbytes = 0;
 		int length = span.Length;
-		int pbytes = sizeof(byte*) * (length + 1);
+		int pbytes = sizeof(byte*) * length;
 
 		// Count the number of bytes required for all the strings
 		for (int idx = 0; idx < length; idx++)
@@ -163,15 +145,14 @@ unsafe public static class NativeUtf8
 			dbytes += GetRequiredBytes(span[idx]);
 		}
 
-		// Allocate the memory for the array
 		byte** array  = (byte**)NativeMemory.Alloc((nuint)(pbytes + dbytes));
 		byte*  buffer = (byte*)((long)array + pbytes);
 
-		// Iterate through all the strings to encode
+		// Encode the strings
 		for (int idx = 0, enc = 0; idx < length; idx++)
 		{
 			// Create the destination buffer
-			Span<byte> dst = new(buffer + enc, dbytes - enc);
+			var dst = new Span<byte>(buffer + enc, dbytes - enc);
 
 			// Encode the string
 			enc += Encode(span[idx], dst);
@@ -180,34 +161,7 @@ unsafe public static class NativeUtf8
 			array[idx] = dst.AsPointer();
 		}
 
-		// Set the pointer to the first string within the array
-		*first = length > 0 ? buffer : null;
-
-		// Set the last pointer to NULL
-		array[length] = null;
-
-		// Return the array
 		return array;
-	}
-
-	/// <summary>
-    /// Encodes a managed string into a null terminated utf8 string
-    /// </summary>
-    /// <param name="str">
-    /// The managed string to encode
-    /// </param>
-    /// <param name="bytes">
-    /// The span of bytes to store the encoded utf8 string wtihin
-    /// </param>
-    /// <returns>
-    /// The number of bytes written to <paramref name="bytes"/> including the null terminator. If
-    /// <paramref name="str"/> is null or <paramref name="bytes"/> is not large enough to store
-    /// the encoded bytes, -1 is returned
-    /// </returns>
-	[MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-	public static int Encode(string? str, Span<byte> bytes)
-	{
-		return str != null ? Encode(str.AsSpan(), bytes) : -1;
 	}
 
 	/// <summary>
@@ -237,106 +191,6 @@ unsafe public static class NativeUtf8
 
 		// Return the number of bytes that were written
 		return written + 1;
-	}
-
-	/// <summary>
-    /// Calculates the hash code of a null terminated utf8 span of bytes
-    /// </summary>
-    /// <param name="bytes">
-    /// The null terminated utf8 span of bytes to calculate the hash code of
-    /// </param>
-    /// <returns>
-    /// The calculated hash code of <paramref name="bytes"/>
-    /// </returns>
-	[MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-	public static int GetHashCode(ReadOnlySpan<byte> bytes)
-	{
-		return GetHashCode(bytes.AsPointer(), bytes.Length);
-	}
-
-	/// <summary>
-    /// Calculates the hash code of a null terminated utf8 string
-    /// </summary>
-    /// <param name="str">
-    /// A pointer to a null terminated utf8 string to calculate the hash code of
-    /// </param>
-    /// <returns>
-    /// The calculated hash code of <paramref name="str"/>. If <paramref name="str"/> is null, 0
-    /// is returned.
-    /// </returns>
-	[MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-	public static int GetHashCode(byte* str)
-	{
-		return GetHashCode(str, GetLength(str));
-	}
-
-	/// <summary>
-    /// Calculates the hash code of a utf8 string
-    /// </summary>
-    /// <param name="str">
-    /// A pointer to the utf8 string to calculate the hash code of
-    /// </param>
-    /// <param name="bytes">
-    /// The number of bytes to hash within <paramref name="str"/>
-    /// </param>
-    /// <returns>
-    /// The calculated hash code of <paramref name="str"/>. If <paramref name="str"/> is null or
-    /// <paramref name="bytes"/> is negative, 0 is returned.
-    /// </returns>
-	public static int GetHashCode(byte* str, int bytes)
-	{
-		int hash = 5381;
-
-		if ((str == null) || (bytes < 0))
-		{
-			return 0;
-		}
-		while (bytes-- > 0)
-		{
-			hash = (hash * 33) ^ str[bytes];
-		}
-
-		return hash;
-	}
-
-	/// <summary>
-    /// Determines if two null terminated utf8 strings are equal
-    /// </summary>
-    /// <param name="str1">
-    /// A pointer to the first null terminated utf8 string to compare
-    /// </param>
-    /// <param name="str2">
-    /// A pointer to the second null terminated utf8 string to compare
-    /// </param>
-    /// <returns>
-    /// True if <paramref name="str1"/> is equal to <paramref name="str2"/>, false otherwise
-    /// </returns>
-	public static bool CompareEqual(byte* str1, byte* str2)
-	{
-		int len;
-
-		// If the lengths of the strings do not match, they can't be equal
-		if ((len = GetLength(str1)) != GetLength(str2))
-		{
-			// Lengths do not match
-			return false;
-		}
-
-		// Are both strings null?
-		else if (len == -1)
-		{
-			// Both strings are null
-			return true;
-		}
-
-		// Both strings are the same length, so we need to compare bytes
-		while (len-- > 0)
-		{
-			if (str1[len] != str2[len]) { return false; }
-		}
-
-		// Both strings are equal
-		return true;
 	}
 
 	/// <summary>
@@ -423,7 +277,7 @@ unsafe public static class NativeUtf8
 	}
 
 	/// <summary>
-    /// Creates a managed string from the bytes decoded from a pointer to a utf8 string
+    /// Creates a managed string produced from decoding a null terminated utf8 string
 	/// </summary>
 	/// <param name="str">
 	/// A pointer to a utf8 string to decode
@@ -433,45 +287,28 @@ unsafe public static class NativeUtf8
 	/// terminator
 	/// </param>
 	/// <returns>
-    /// A managed string decoded from <paramref name="str"/>. If <paramref name="str"/> is null or
-    /// <paramref name="bytes"/> is negative, null is returned.
+    /// The managed string. If <paramref name="str"/> is null or <paramref name="bytes"/> is less
+    /// than or equal to 0, null is returned.
 	/// </returns>
 	[MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
 	public static string? GetString(byte* str, int bytes)
 	{
-		return (str != null) && (bytes >= 0) ? Encoding.GetString(str, bytes) : null;
+		return (str != null) && (bytes > 0) ? Encoding.GetString(str, bytes) : null;
 	}
 
 	/// <summary>
-    /// Decodes all of the null terminated utf8 strings within a null terminated, native string
-    /// array into a managed string array
+    /// Creates a managed string array produced by decoding a number of null terminated utf8 strings
+    /// within a native array
     /// </summary>
     /// <param name="array">
-	/// The native string array containing the strings to decode
-	/// </param>
-    /// <returns>
-    /// If <paramref name="array"/> is not null a managed string array containing the decoded
-    /// native strings is returned, otherwise null is returned.
-    /// </returns>
-	[MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-	public static string[]? GetArray(byte** array)
-	{
-		return GetArray(array, NativeArray.GetLength(array));
-	}
-
-	/// <summary>
-    /// Decodes a number of null terminated utf8 strings within a native string array into a
-    /// managed string array
-    /// </summary>
-    /// <param name="array">
-	/// The native string array containing the strings to decode
+	/// The native array containing the strings to decode
 	/// </param>
     /// <param name="length">
     /// The number of strings within the array to decode
     /// </param>
     /// <returns>
-    /// If <paramref name="array"/> is not null and <paramref name="length"/> is >= 0, a managed
-    /// string array containing the decoded native strings is returned, otherwise null is returned.
+    /// The managed string array. If <paramref name="array"/> is null or <paramref name="length"/>
+    /// is less than 0, null is returned.
     /// </returns>
 	public static string[]? GetArray(byte** array, int length)
 	{
@@ -499,12 +336,11 @@ unsafe public static class NativeUtf8
     /// </param>
     /// <returns>
     /// The number of bytes required to encode <paramref name="str"/> including a null terminator.
-    /// If <paramref name="str"/> is null, 0 is returned.
     /// </returns>
 	[MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
 	public static int GetRequiredBytes(string? str)
 	{
-		return str != null ? Encoding.GetByteCount(str) + 1 : 0;
+		return str != null ? Encoding.GetByteCount(str) + 1 : 1;
 	}
 
 	/// <summary>
@@ -554,7 +390,7 @@ unsafe public static class NativeUtf8
 	/// </param>
 	/// <returns>
 	/// The over estimated number of bytes required to encode <paramref name="str"/> including a
-    /// null terminator. If <paramref name="str"/> is null, -1 is returned.
+    /// null terminator
 	/// </returns>
 	/// <remarks>
     /// This function is faster to execute than calculating the exact number of bytes required for
@@ -563,7 +399,7 @@ unsafe public static class NativeUtf8
 	[MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
 	public static int GetMaxRequiredBytes(string? str)
 	{
-		return str != null ? GetMaxRequiredBytes(str.Length) : -1;
+		return str != null ? GetMaxRequiredBytes(str.Length) : 1;
 	}
 
 	/// <summary>
