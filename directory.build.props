@@ -1,0 +1,30 @@
+<Project>
+	<PropertyGroup>	
+		<!-- Common properties -->
+		<UseArtifactsOutput>true</UseArtifactsOutput>
+		<ArtifactsPath>$(MSBuildThisFileDirectory)artifacts</ArtifactsPath>
+		<AssetsPath>assets\</AssetsPath>
+		<BuildTransitivePath>$(AssetsPath)buildTransitive\</BuildTransitivePath>
+		<TargetFramework>net10.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<NoWarn>IDE0063,IDE0066,IDE0251,IDE0290,IDE1006,SYSLIB1054,CA1416,CA1859,IDE0130</NoWarn>
+		
+		<!-- Nuget properties -->
+		<LocalNugetSource>$(HOME)\.nuget-local</LocalNugetSource>
+		<RestoreAdditionalProjectSources>$(LocalNugetSource)</RestoreAdditionalProjectSources>
+	</PropertyGroup>
+	
+	<!-- Embed PDB only if debug build -->
+	<PropertyGroup Condition="$(Configuration)==Debug">
+		<DebugSymbols>true</DebugSymbols>
+		<DebugType>embedded</DebugType>
+	</PropertyGroup>
+
+	<!-- Don't generate PDB if release build -->
+	<PropertyGroup Condition="$(Configuration)==Release">
+		<DebugSymbols>false</DebugSymbols>
+		<DebugType>None</DebugType>
+	</PropertyGroup>
+</Project>

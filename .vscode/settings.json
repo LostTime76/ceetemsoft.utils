@@ -1,0 +1,9 @@
+{	
+	"csharp.suppressBuildAssetsNotification": true,
+	"csharp.suppressDotnetRestoreNotification": true,
+	"omnisharp.disableMSBuildDiagnosticWarning": true,
+
+	"files.exclude": {
+		".git": true
+	}
+}
