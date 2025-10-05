@@ -23,62 +23,26 @@ public ref struct SpanReader<T>
 	}
 
 	/// <summary>
-    /// Reads the next element within the span
-    /// </summary>
-    /// <returns>
-    /// The next element read from within the span or default if there are no more elements to read
-    /// </returns>
-	[return: MaybeNull]
+	/// Reads an element from the span
+	/// </summary>
+	/// <returns>
+	/// The element read from the span
+	/// </returns>
+	/// <exception cref="InvalidOperationException">
+	/// Thrown if there are no more elements left to read from the span
+	/// </exception>
 	public T Read()
 	{
-		return Current = Index < Span.Length ? Span[Index++] : default;
-	}
-
-	/// <summary>
-	/// Reads all the elements that are left to be read from the span
-	/// </summary>
-	/// <returns>
-	/// Null if no elements were read, otherwise an enumerable containing the elements read from
-	/// the span
-	/// </returns>
-	public IEnumerable<T>? ReadLeft()
-	{
-		return Read(Left);
-	}
-
-	/// <summary>
-	/// Reads a number of elements from the span
-	/// </summary>
-	/// <param name="elements">
-	/// The number of elements to read
-	/// </param>
-	/// <returns>
-	/// Null if no elements were read, otherwise an enumerable containing the elements read from
-	/// the span
-	/// </returns>
-	/// <exception cref="ArgumentOutOfRangeException">
-	/// Thrown if <paramref name="elements"/> is less than 0 or greater than <see cref="Left"/>
-	/// </exception>
-	public IEnumerable<T>? Read(int elements)
-	{
-		if (elements == 0)
+		if (Index == Span.Length)
 		{
-			return null;
-		}
-		else if ((elements < 0) || (elements > Left))
-		{
-			ThrowInvalidNumberOfElements(nameof(elements));
+			ThrowExhausted();
 		}
 
-		List<T> outputs = [];
-
-		for(int count = 0; count < elements; count++)
-		{
-			outputs.Add(Read()!);
-		}
-
-		return outputs;
+		return Current = Span[Index++];
 	}
+
+	private static void ThrowExhausted() =>
+		throw new InvalidOperationException("There are no more elements to read.");
 
 	/// <summary>
     /// Implicitly converts a span to a reader
@@ -86,21 +50,7 @@ public ref struct SpanReader<T>
     /// <param name="span">
     /// The span to convert to a reader
     /// </param>
-	public static implicit operator SpanReader<T>(Span<T> span)
-	{
-		return new(span);
-	}
-
-	/// <summary>
-    /// Implicitly converts a span to a reader
-    /// </summary>
-    /// <param name="span">
-    /// The span to convert to a reader
-    /// </param>
-	public static implicit operator SpanReader<T>(ReadOnlySpan<T> span)
-	{
-		return new(span);
-	}
+	public static implicit operator SpanReader<T>(ReadOnlySpan<T> span) => new(span);
 
 	/// <summary>
     /// Implicitly converts an array to a reader
@@ -108,23 +58,15 @@ public ref struct SpanReader<T>
     /// <param name="array">
     /// The array to convert to a reader
     /// </param>
-	public static implicit operator SpanReader<T>(T[] array)
-	{
-		return new(array.AsSpan());
-	}
-
-	private static void ThrowInvalidNumberOfElements(string param)
-	{
-		throw new ArgumentOutOfRangeException(param);
-	}
+	public static implicit operator SpanReader<T>(T[] array) =>	new(array.AsSpan());
 
 	/// <summary>
-	/// Gets the current reader index within the span
+	/// Gets the current reader index
 	/// </summary>
 	public int Index { get; private set; }
 
 	/// <summary>
-	/// Gets the number of elements left to read within the span
+	/// Gets the number of elements left to read from the span
 	/// </summary>
 	public int Left => Span.Length - Index;
 
