@@ -88,11 +88,5 @@ public static class FileExtensions
 			return !string.IsNullOrEmpty(filepath) && File.Exists(filepath) ?
 				File.GetLastWriteTime(filepath).Ticks : -1;
 		}
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-		private static bool Exists(string directory, string filepath, out string resolved)
-		{
-			return File.Exists(resolved = Path.Combine(directory, filepath));
-		}
 	}
 }
