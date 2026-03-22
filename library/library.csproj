@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<PackageId>ceetemsoft.utils</PackageId>
+		<VersionPrefix>2.0.0</VersionPrefix>
+		<Authors>colton.murphy</Authors>
+		<Company>CeetemSoft</Company>
+		<NoPackageAnalysis>true</NoPackageAnalysis>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<AssemblyName>$(PackageId)</AssemblyName>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<TargetFramework>net10.0</TargetFramework>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="System.CommandLine" Version="2.0.5" />
+	</ItemGroup>
+</Project>

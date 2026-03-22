@@ -1,0 +1,18 @@
+<Project>
+	<Target Name="PostPush" AfterTargets="Pack" Condition="$(IsPackable)==true and $(VersionSuffix)==local">
+		<PropertyGroup>
+			<PackagePath>$(ArtifactsPath)\package\$(Configuration)\$(PackageId).$(Version).nupkg</PackagePath>
+			<PackageInstallPath>$(NugetPackageRoot)$(PackageId)\$(Version)</PackageInstallPath>
+		</PropertyGroup>
+		
+		<!-- Push the package to the local nuget repository -->
+		<Exec Command="dotnet nuget push &quot;$(PackagePath)&quot; --source &quot;$(LocalNugetSource)&quot;"/>
+		
+		<!-- Delete any locally installed package -->
+		<RemoveDir Directories="$(PackageInstallPath)" Condition="Exists($(PackageInstallPath))"/>
+	</Target>
+
+	<Target Name="PostClean" AfterTargets="Clean">
+		<RemoveDir Directories="$(ArtifactsPath)"/>
+	</Target>
+</Project>
