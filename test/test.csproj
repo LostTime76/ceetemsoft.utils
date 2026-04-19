@@ -4,6 +4,7 @@
 		<AssemblyName>test</AssemblyName>
 		<IsPackable>false</IsPackable>
 		<LangVersion>preview</LangVersion>
+		<TargetFramework>net11.0</TargetFramework>
 	</PropertyGroup>
 
 	<ItemGroup>

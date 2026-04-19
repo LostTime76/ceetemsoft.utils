@@ -8,7 +8,7 @@
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<AssemblyName>$(PackageId)</AssemblyName>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<TargetFramework>net10.0</TargetFramework>
+		<TargetFramework>net11.0</TargetFramework>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="System.CommandLine" Version="2.0.5" />
