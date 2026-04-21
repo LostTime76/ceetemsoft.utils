@@ -23,7 +23,7 @@ public static class GitUtils
 	/// </returns>
 	public static string GetCommit(string? directory = null)
 	{
-		var result = Process.Exec(Executable, GetCommitCommand);
+		var result = Process.Exec(Executable, GetCommitCommand, directory);
 
 		return (result.Output ?? string.Empty).Trim();
 	}

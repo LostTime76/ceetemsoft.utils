@@ -1,5 +1,3 @@
-using CeetemSoft.Utils;
-using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace CeetemSoft.Io;
@@ -11,6 +9,38 @@ public static class FileExtensions
 {
 	extension(File)
 	{
+		/// <summary>
+		/// Writes data to a file is the contents of the file are different than the data to write.
+		/// Any intermediate directories to the file are automatically created
+		/// </summary>
+		/// <param name="filepath">
+		/// The path of the file to write to
+		/// </param>
+		/// <param name="data">
+		/// The data to write to the file
+		/// </param>
+		/// <exception cref="ArgumentException">
+		/// Thrown if <paramref name="filepath"/> is null, empty, or only contains whitespace
+		/// characters
+		/// </exception>
+		public static void WriteAllBytesIfDifferent(string filepath, ReadOnlySpan<byte> data)
+		{
+			ArgumentException.ThrowIfNullOrWhiteSpace(filepath, nameof(filepath));
+
+			var directory = Path.GetDirectoryName(filepath);
+
+			if (!string.IsNullOrEmpty(directory))
+			{
+				Directory.CreateDirectory(directory);
+			}
+			else if (File.Exists(filepath) && (File.ReadAllBytes(filepath) == data))
+			{
+				return;
+			}
+
+			File.WriteAllBytes(filepath, data);
+		}
+
 		/// <summary>
 		/// Writes text to a file if the contents of the file are different than the text to write.
 		/// Any intermediate directories to the file are automatically created.
@@ -42,7 +72,7 @@ public static class FileExtensions
 			{
 				Directory.CreateDirectory(directory);
 			}
-			else if (File.Exists(filepath) && (File.ReadAllText(filepath, encoding) != text))
+			else if (File.Exists(filepath) && (File.ReadAllText(filepath, encoding) == text))
 			{
 				return;
 			}

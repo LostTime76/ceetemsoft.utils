@@ -6,7 +6,7 @@ namespace CeetemSoft.Cli;
 /// <summary>
 /// Provides a basic string argument that publishes an error if it contains only whitespace
 /// </summary>
-public class NonWhitespaceArgument : Argument <string>
+public class NonWhitespaceOption : Option <string>
 {
 	/// <summary>
 	/// Creates a new argument
@@ -14,16 +14,16 @@ public class NonWhitespaceArgument : Argument <string>
 	/// <param name="name">
 	/// The name of the argument
 	/// </param>
-	public NonWhitespaceArgument(string name) : base(name)
+	public NonWhitespaceOption(string name) : base(name)
 	{
 		Validators.Add(Validate);
 	}
 
-	private static void Validate(ArgumentResult result)
+	private static void Validate(OptionResult result)
 	{
 		if (string.IsNullOrWhiteSpace(result.Tokens[0].Value))
 		{
-			result.AddError($"'{result.Argument.Name}' cannot only contain whitespace characters.");
+			result.AddError($"'{result.Option.Name}' cannot only contain whitespace characters.");
 		}
 	}
 }
