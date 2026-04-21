@@ -188,7 +188,7 @@ public sealed class CoffImage
 	/// <exception cref="BadImageFormatException">
 	/// Thrown if the image is not in a valid format or there was a problem loading the image
 	/// </exception>
-	public static CoffImage FromFile(string filepath) => new(File.ReadAllBytes(filepath));
+	public static CoffImage Load(string filepath) => new(File.ReadAllBytes(filepath));
 
 	private void LoadHeader()
 	{

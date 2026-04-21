@@ -72,7 +72,7 @@ public static class FileExtensions
 			{
 				Directory.CreateDirectory(directory);
 			}
-			else if (File.Exists(filepath) && (File.ReadAllText(filepath, encoding) == text))
+			if (File.Exists(filepath) && (File.ReadAllText(filepath, encoding) == text))
 			{
 				return;
 			}
