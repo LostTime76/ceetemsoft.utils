@@ -76,7 +76,7 @@ public sealed class CoffImage
 	/// <returns>
 	/// The converted flat binary
 	/// </returns>
-	public byte[] ToBytes(int address, int size, byte fill = 0xFF, bool swapWords = true)
+	public byte[] ToBytes(int address, int size, byte fill = 0xFF, bool swapWords = false)
 	{
 		int end = address + size;
 
