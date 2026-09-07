@@ -1,3 +1,6 @@
+using System.Diagnostics;
+using CeetemSoft.Processes;
+
 namespace Test;
 
 public static partial class Program

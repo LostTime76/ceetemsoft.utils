@@ -1,4 +1,5 @@
 using CeetemSoft.Processes;
+using LibGit2Sharp;
 using System.Diagnostics;
 
 namespace CeetemSoft.Utils;
@@ -33,14 +34,20 @@ public static class GitUtils
 	/// </returns>
 	public static string? GetCommit(string? directory = null)
 	{
-		var result = Process.Exec(Executable, GetCommitCommand, directory);
-		var commit = (result.Output ?? string.Empty).Trim();
+		try
+		{
+			// Discover the .git repository directory
+			directory = Repository.Discover(directory ?? Directory.GetCurrentDirectory());
 
-		if ((result.ExitCode != 0) || (commit.Length != CommitSize))
+			// Create the repository
+			var repository = new Repository(directory);
+
+			// Get the current commit hash
+			return repository.Head.Tip.Sha;
+		}
+		catch
 		{
 			return null;
 		}
-
-		return commit;
 	}
 }

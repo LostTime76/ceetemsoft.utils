@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using CeetemSoft.Utils;
 
 namespace CeetemSoft.Processes;
 
@@ -8,42 +7,51 @@ namespace CeetemSoft.Processes;
 /// </summary>
 public static class ProcessExtensions
 {
+	private delegate void ArgumentsAddFunc(ProcessStartInfo settings);
+
 	extension(Process)
 	{
 		/// <summary>
-		/// Run a process executable with command line arguments and a specified working directory
+		/// Runs an executable using the given command and working directory
 		/// </summary>
-		/// <param name="executable">
-		/// The process executable to run
-		/// </param>
-		/// <param name="arguments">
-		/// The command line arguments to pass to the process
+		/// <param name="command">
+		/// An enumerable containing the command line invocation for the executable. The first
+		/// element within the enumerable is interpreted as the executable filename. Subsequent
+		/// elements are arguments passed to the executable.
 		/// </param>
 		/// <param name="directory">
-		/// The working directory of the process. If the value is null or empty, the current
-		/// working directory is used.
+		/// The working directory of the process
 		/// </param>
 		/// <returns>
 		/// The result of the process invocation
 		/// </returns>
-		/// <exception cref="ArgumentException">
-		/// Thrown if <paramref name="executable"/> is null, empty, or only contains whitespace
-		/// characters
+		/// <exception cref="ArgumentNullException">
+		/// Thrown if <paramref name="command"/>null
 		/// </exception>
-		public static ProcessResult Exec(
-			string executable, string? arguments = null, string? directory = null)
+		/// <exception cref="ArgumentException">
+		/// Thrown if the executable filename is null or contains only whitespace
+		/// </exception>
+		public static ProcessResult Exec(IEnumerable<string> command, string? directory = null)
 		{
+			ArgumentNullException.ThrowIfNull(command, nameof(command));
+
+			var executable = command.FirstOrDefault();
+
 			ArgumentException.ThrowIfNullOrWhiteSpace(executable, nameof(executable));
 
 			var settings = new ProcessStartInfo()
 			{
 				FileName               = executable,
 				WorkingDirectory       = directory ?? string.Empty,
-				Arguments              = arguments ?? string.Empty,
 				RedirectStandardInput  = true,
 				RedirectStandardOutput = true,
 				RedirectStandardError  = true
 			};
+
+			foreach(var argument in command.Skip(1))
+			{
+				settings.ArgumentList.Add(argument);
+			}
 
 			var     process = new Process() { StartInfo = settings };
 			string? output  = null;
