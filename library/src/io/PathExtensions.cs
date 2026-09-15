@@ -42,22 +42,5 @@ public static class PathExtensions
 		{
 			return Path.GetDirectoryName(source)!;
 		}
-
-		/// <summary>
-		/// Strips an extension from a filepath
-		/// </summary>
-		/// <param name="filepath">
-		/// The filepath to strip the extension from
-		/// </param>
-		/// <returns>
-		/// The filepath with the extension stripped
-		/// </returns>
-		public static string StripExtension(string? filepath)
-		{
-			string directory = Path.GetDirectoryName(filepath) ?? string.Empty;
-			string filename  = Path.GetFileNameWithoutExtension(filepath) ?? string.Empty;
-
-			return Path.Combine(directory, filename);
-		}
 	}
 }
