@@ -32,7 +32,7 @@ public readonly struct BasicGitInfo
 				IsDirty = status.IsDirty,
 				AheadBy = head.TrackingDetails.AheadBy ?? 0,
 				Branch  = head.FriendlyName,
-				Commit  = head.Tip.Sha
+				Commit  = Convert.FromHexString(head.Tip.Sha)
 			};
 		}
 		catch
@@ -60,5 +60,5 @@ public readonly struct BasicGitInfo
 	/// <summary>
 	/// Gets the hash of the current commit within the repository
 	/// </summary>
-	public string? Commit { get; private init; }
+	public byte[] Commit { get; private init; }
 }

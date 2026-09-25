@@ -4,6 +4,7 @@
 	"omnisharp.disableMSBuildDiagnosticWarning": true,
 
 	"files.exclude": {
-		".git": true
+		".git": true,
+		"obj": true
 	}
 }
