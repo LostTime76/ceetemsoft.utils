@@ -1,6 +1,3 @@
-using CeetemSoft.Io;
-using CeetemSoft.Utils;
-
 namespace Test;
 
 public static partial class Program
