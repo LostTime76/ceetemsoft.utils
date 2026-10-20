@@ -1,6 +1,4 @@
 using System.Buffers.Binary;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using System.Text;
 
 namespace CeetemSoft.Utils;
@@ -10,31 +8,62 @@ namespace CeetemSoft.Utils;
 /// </summary>
 public static class SpanExtensions
 {
+	private static readonly Encoder _encoder = Encoding.UTF8.GetEncoder();
+
 	extension(Span<byte> span)
 	{
+		/// <summary>
+		/// Writes byte data to a span
+		/// </summary>
+		/// <param name="data">
+		/// The data to write to the span
+		/// </param>
+		/// <returns>
+		/// The shorter length of <paramref name="span"/> and <paramref name="data"/>
+		/// </returns>
+		/// <remarks>
+		/// The number of bytes written to the span is truncated up to the length of the span. Any
+		/// unused bytes within the span will be zero filled up to its length.
+		/// </remarks>
+		public int Write(ReadOnlySpan<byte> data)
+		{
+			int length = Math.Min(span.Length, data.Length);
+
+			// Copy up until the end of the span
+			data[..length].CopyTo(span);
+
+			// Fill the rest of the span with zeros
+			span[length..span.Length].Clear();
+
+			// Return the number of real bytes written
+			return length;
+		}
+
 		/// <summary>
 		/// Writes a string value to a span
 		/// </summary>
 		/// <param name="value">
 		/// The string value to write
 		/// </param>
-		/// <param name="encoding">
-		/// The encoding used to encode the string into byte data or null to use utf8
-		/// </param>
-		public void WriteString(string? value, Encoding? encoding = null)
+		/// <returns>
+		/// The number of characters written to the span
+		/// </returns>
+		/// <remarks>
+		/// The number of characters written to the span is truncated to the number of valid
+		/// encoded characters that can fit within the span. Any unused bytes within the span will
+		/// be zero filled up to its length.
+		/// </remarks>
+		public int WriteString(string? value)
 		{
-			// Default encoding is utf8
-			encoding ??= Encoding.UTF8;
+			// Encode the string into the span
+			_encoder.Convert(value ?? string.Empty, span, true,
+				out int chars, out int bytes, out _);
 
-			// Encode the string into bytes
-			var bytes  = value != null ? encoding.GetBytes(value) : [];
-			int length = Math.Min(span.Length, bytes.Length);
+			// Zero fill the rest of the span
+			span[bytes..span.Length].Clear();
 
-			// Copy up until the end of the span
-			bytes[..length].CopyTo(span);
-
-			// Fill the rest of the span with zeros
-			span[length..span.Length].Clear();
+			// Return the number of chars that were encoded
+			return chars;
 		}
 
 		/// <summary>

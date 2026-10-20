@@ -7,6 +7,8 @@ namespace CeetemSoft.Io;
 /// </summary>
 public static class FileExtensions
 {
+	private static readonly Encoding Encoding = new UTF8Encoding(false);
+
 	extension(File)
 	{
 		/// <summary>
@@ -64,7 +66,7 @@ public static class FileExtensions
 			ArgumentException.ThrowIfNullOrWhiteSpace(filepath, nameof(filepath));
 
 			text     ??= string.Empty;
-			encoding ??= Encoding.UTF8;
+			encoding ??= Encoding;
 
 			var directory = Path.GetDirectoryName(filepath);
 
