@@ -208,15 +208,15 @@ public sealed class KeyValueArguments : IReadOnlyDictionary<string, string>
 			return false;
 		}
 
-		var tokens = argument.Split(Separators, StringSplitOptions.RemoveEmptyEntries);
+		var index = argument.IndexOfAny(Separators);
 
-		if (tokens.Length != 2)
+		if (index <= 0)
 		{
 			ThrowInvalidKeyValueFormat(argument);
 		}
 
-		key   = tokens[0].Trim();
-		value = tokens[1].Trim();
+		key   = argument[..index].Trim();
+		value = argument[(index+1)..].Trim();
 
 		if (string.IsNullOrWhiteSpace(key) || string.IsNullOrWhiteSpace(value))
 		{
