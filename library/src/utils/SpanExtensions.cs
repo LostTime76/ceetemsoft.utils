@@ -8,7 +8,8 @@ namespace CeetemSoft.Utils;
 /// </summary>
 public static class SpanExtensions
 {
-	private static readonly Encoder _encoder = Encoding.UTF8.GetEncoder();
+	private static readonly Encoding _encoding = Encoding.UTF8;
+	private static readonly Encoder  _encoder  = _encoding.GetEncoder();
 
 	extension(Span<byte> span)
 	{
@@ -273,5 +274,19 @@ public static class SpanExtensions
 		/// The value that was read
 		/// </returns>
 		public long ReadInt64Be() => BinaryPrimitives.ReadInt64BigEndian(span);
+
+		/// <summary>
+		/// Reads a string from a span in utf8 encoding
+		/// </summary>
+		/// <returns>
+		/// The string read from the span
+		/// </returns>
+		public string ReadString()
+		{
+			int index  = span.IndexOf((byte)0);
+			var sliced = index >= 0 ? span[..index] : span;
+
+			return _encoding.GetString(sliced);
+		}
 	}
 }

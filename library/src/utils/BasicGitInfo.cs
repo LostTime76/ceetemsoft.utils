@@ -29,7 +29,8 @@ public readonly struct BasicGitInfo
 
 			return new()
 			{
-				Flags   = new(status.IsDirty, head.TrackingDetails.AheadBy ?? 0),
+				IsDirty = status.IsDirty,
+				AheadBy = head.TrackingDetails.AheadBy ?? 0,
 				Branch  = head.FriendlyName,
 				Commit  = Convert.FromHexString(head.Tip.Sha)
 			};
@@ -41,9 +42,15 @@ public readonly struct BasicGitInfo
 	}
 
 	/// <summary>
-	/// Gets the status flags
+	/// Gets a value that indicates if the repository has local uncomitted changes
 	/// </summary>
-	public GitInfoFlags Flags { get; private init; }
+	public bool IsDirty { get; private init; }
+
+	/// <summary>
+	/// Gets a value that indicates the number of commits that have not yet been pushed to the
+	/// repository
+	/// </summary>
+	public int AheadBy { get; private init; }
 
 	/// <summary>
 	/// Gets the name of the current branch within the repository
